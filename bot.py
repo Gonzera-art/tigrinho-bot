@@ -11,7 +11,7 @@ TOKEN = "SEU_TOKEN_AQUI"
 PREFIX = "!"
 DONO_ID = 1277801876523454547
 CANAL_BOT = 1513290347973967962
-ANTHROPIC_KEY = "CHAVE_ANTHROPIC"
+OPENAI_KEY = ""
 
 CARGOS_LOJA = {
     "soldado": 1513239906246332638,
@@ -72,20 +72,19 @@ A resposta correta deve variar entre A B C e D."""
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                "https://api.anthropic.com/v1/messages",
+                "https://api.openai.com/v1/chat/completions",
                 headers={
-                    "x-api-key": ANTHROPIC_KEY,
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json"
+                    "Authorization": f"Bearer {OPENAI_KEY}",
+                    "Content-Type": "application/json"
                 },
                 json={
-                    "model": "claude-haiku-4-5-20251001",
+                    "model": "gpt-3.5-turbo",
                     "max_tokens": 300,
                     "messages": [{"role": "user", "content": prompt}]
                 }
             ) as r:
                 data = await r.json()
-                texto = data["content"][0]["text"].strip()
+                texto = data["choices"][0]["message"]["content"].strip()
                 inicio = texto.find("{")
                 fim = texto.rfind("}") + 1
                 texto = texto[inicio:fim]
@@ -117,6 +116,8 @@ def get_usuario(dados, uid):
     u = dados[uid]
     if "wins" not in u:
         u["wins"] = 0
+    if "total" not in u:
+        u["total"] = u["fichas"]
     if "minigames" not in u:
         u["minigames"] = {"data": hoje, "pescar": 0, "cacar": 0, "minerar": 0, "roubar": 0}
     if u["minigames"]["data"] != hoje:
@@ -496,7 +497,7 @@ async def roubar(ctx, membro: discord.Member):
         u["total"] += ganho
         alvo["fichas"] -= ganho
         await ctx.send(f"🦹 {ctx.author.mention} roubou **{ganho} fichas** de {membro.mention}! (**{restantes}/3** restantes hoje)")
-        await verifica_patente(ctx, u, dados)
+ await verificar_patente(ctx, u, dados)
     else:
         multa = random.randint(50, 150)
         u["fichas"] = max(0, u["fichas"] - multa)
@@ -617,8 +618,7 @@ async def comprar(ctx, item: str):
         salvar(dados)
         await ctx.send(f"✅ {ctx.author.mention} comprou **{produto['nome']}** e recebeu o cargo!")
     except discord.Forbidden:
-        await ctx.send("❌ O bot não tem permissão para gerenciar cargos!")
-@bot.command(name="lutar")
+        await ctx.send("❌ O bot não tem permissão para gerenciar cargos!")("@bot.command(name="lutar")
 async def lutar(ctx, membro: discord.Member):
     if membro.id == ctx.author.id:
         await ctx.send("❌ Você não pode lutar contra si mesmo!")
