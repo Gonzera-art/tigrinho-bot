@@ -496,8 +496,8 @@ async def roubar(ctx, membro: discord.Member):
         u["fichas"] += ganho
         u["total"] += ganho
         alvo["fichas"] -= ganho
-        await ctx.send(f"🦹 {ctx.author.mention} roubou **{ganho} fichas** de {membro.mention}! (**{restantes}/3** restantes hoje)")
- await verificar_patente(ctx, u, dados) 
+         await ctx.send(f"🦹 {ctx.author.mention} roubou **{ganho} fichas** de {membro.mention}! (**{restantes}/3** restantes hoje)")
+         await verificar_patente(ctx, u, dados) 
     else:
         multa = random.randint(50, 150)
         u["fichas"] = max(0, u["fichas"] - multa)
@@ -617,7 +617,7 @@ async def comprar(ctx, item: str):
         u["fichas"] -= produto["preco"]
         salvar(dados)
         await ctx.send(f"✅ {ctx.author.mention} comprou **{produto['nome']}** e recebeu o cargo!")
-       except discord.Forbidden
+    except discord.Forbidden
         await ctx.send("❌ O bot não tem permissão para gerenciar cargos!")
        
         ("@bot.command(name="lutar")
